@@ -19,9 +19,11 @@ const paddleTwo = {
     height: 100,
     thickness: 15,
     upPressed: false,
-    downPressed: false
+    downPressed: false,
+    score: 0
 }
 
+const gameoverPoint = 11
 const canvas = document.getElementById('gameCanvas');
 const canvasContext = canvas.getContext('2d');
 const framesPerSecond = 30;
@@ -40,8 +42,10 @@ function ballReset() {
 }
 
 function moveEverything() {
-    moveBall();
-    movePaddles();
+    if (paddleOne.score < gameoverPoint || paddleTwo.score < gameoverPoint) { 
+        moveBall();
+        movePaddles();
+    }
 }
 
 function isPaddleTouchingBall(paddle) {
@@ -64,16 +68,17 @@ function moveBall() {
         } else if (ball.x + ball.speedX >= canvas.width - paddleTwo.thickness) {
             movementX = canvas.width - paddleTwo.thickness - ball.x;
         }
-    } else if (ball.x < 0 || ball.x > canvas.width) {
+    } else if (ball.x < 0) {
+        paddleTwo.score = paddleTwo.score + 1;
         ballReset();
-        return;
-    }
-    if (ball.y < 0 || ball.y > canvas.height) {
+    } else if (ball.x > canvas.width) {
+        paddleOne.score = paddleOne.score + 1;
+        ballReset();
+    } if (ball.y < 0 || ball.y > canvas.height) {
         ball.speedY = -ball.speedY;
     }
     ball.x = ball.x + movementX;
     ball.y = ball.y + ball.speedY;
-    
 }
 
 function movePaddles() {
@@ -124,17 +129,27 @@ function keyUpHandler(e) {
 }  // about which keys I want to ues
 
 function drawEverything() {
-    colorRect(0, 0, canvas.width, canvas.height, 'black');
-    // above line blanks out the screen with black
-
-    colorRect(0, paddleOne.y, paddleOne.thickness, paddleOne.height, 'blue');
-    // this is left player paddle
-
-    colorRect(canvas.width - paddleTwo.thickness, paddleTwo.y, paddleTwo.thickness, paddleTwo.height, 'red');
-    // this is right player paddle
-
-    colorCircle(ball.x, ball.y, ball.size, 'white')
-    // above line draws the ball
+    if (paddleOne.score < gameoverPoint || paddleTwo.score < gameoverPoint) {
+        colorRect(0, 0, canvas.width, canvas.height, 'black');
+        // above line blanks out the screen with black
+    
+        colorRect(0, paddleOne.y, paddleOne.thickness, paddleOne.height, 'blue');
+        // this is left player paddle
+    
+        colorRect(canvas.width - paddleTwo.thickness, paddleTwo.y, paddleTwo.thickness, paddleTwo.height, 'red');
+        // this is right player paddle
+    
+        colorCircle(ball.x, ball.y, ball.size, 'white')
+        // above line draws the ball
+        canvasContext.font = "30px Comic Sans MS";
+        canvasContext.fillStyle = 'white';
+        canvasContext.fillText(paddleOne.score, 50, 50);
+        canvasContext.fillText(paddleTwo.score, canvas.width - 70, 50);
+    } else {
+        canvasContext.font = "200px Comic Sans MS";
+        canvasContext.fillStyle = 'white';
+        canvasContext.fillText("Game Over", canvas.width/2, canvas.height/2);
+    }
 }
 
 function colorCircle(centerX, centerY, radius, drawColor) {
