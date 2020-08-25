@@ -27,10 +27,11 @@ const paddleTwo = {
 const canvas = document.getElementById('gameCanvas');
 const canvasContext = canvas.getContext('2d');
 const framesPerSecond = 30;
-const gameoverPoint = 11;
+const gameoverPoint = 99;
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+document.getElementById("gameCanvas").addEventListener("click", clickMouse);
 
 setInterval(function () {
     moveEverything();
@@ -40,10 +41,11 @@ setInterval(function () {
 function ballReset() {
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
+    ball.speedX = -ball.speedX;
 }
 
 function moveEverything() {
-    if (paddleOne.score <= gameoverPoint || paddleTwo.score <= gameoverPoint) { 
+    if (paddleOne.score < gameoverPoint && paddleTwo.score < gameoverPoint) { 
         moveBall();
         movePaddles();
     }
@@ -57,14 +59,14 @@ function moveBall() {
     let movementX = ball.speedX;
     if (isPaddleTouchingBall(paddleOne)) {
         if (ball.x <= paddleOne.thickness) {
-            ball.speedX = -ball.speedX;
+            ball.speedX = Math.abs(ball.speedX);
             movementX = ball.speedX;
         } else if (ball.x + ball.speedX <= paddleOne.thickness) {
             movementX = paddleOne.thickness - ball.x;
         }
     } else if (isPaddleTouchingBall(paddleTwo)) {
         if (ball.x >= canvas.width - paddleTwo.thickness) {
-            ball.speedX = -ball.speedX;
+            ball.speedX = -Math.abs(ball.speedX);
             movementX = ball.speedX;
         } else if (ball.x + ball.speedX >= canvas.width - paddleTwo.thickness) {
             movementX = canvas.width - paddleTwo.thickness - ball.x;
@@ -81,6 +83,12 @@ function moveBall() {
     ball.x = ball.x + movementX;
     ball.y = ball.y + ball.speedY;
 }
+
+function clickMouse() {
+    paddleOne.score = 0;
+    paddleTwo.score = 0;
+}
+
 
 function keyDownHandler(e) {
     if (e.key == "Up" || e.key == "ArrowUp") {
@@ -144,7 +152,7 @@ function movePaddleUp(paddle) {
 }
 
 function drawEverything() {
-    if (paddleOne.score <= gameoverPoint || paddleTwo.score <= gameoverPoint) {
+    if (paddleOne.score < gameoverPoint && paddleTwo.score < gameoverPoint) {
         colorRect(0, 0, canvas.width, canvas.height, 'black');
         // above line blanks out the screen with black
     
@@ -162,8 +170,8 @@ function drawEverything() {
         canvasContext.fillText(paddleTwo.score, canvas.width - 70, 50);
     } else {
         canvasContext.font = "20px Comic Sans MS";
-        canvasContext.fillStyle = 'black';
-        canvasContext.fillText("Game Over", canvas.width/2, canvas.height/2);
+        canvasContext.fillStyle = 'white';
+        canvasContext.fillText("Game Over", canvas.width/2 - 30, canvas.height/2);
     }
 }
 
