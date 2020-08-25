@@ -11,7 +11,8 @@ const paddleOne = {
     height: 100,
     thickness: 15,
     upPressed: false,
-    downPressed: false
+    downPressed: false,
+    score: 0
 };
 const paddleTwo = {
     y: 250,
@@ -23,10 +24,10 @@ const paddleTwo = {
     score: 0
 }
 
-const gameoverPoint = 11
 const canvas = document.getElementById('gameCanvas');
 const canvasContext = canvas.getContext('2d');
 const framesPerSecond = 30;
+const gameoverPoint = 11;
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
@@ -42,7 +43,7 @@ function ballReset() {
 }
 
 function moveEverything() {
-    if (paddleOne.score < gameoverPoint || paddleTwo.score < gameoverPoint) { 
+    if (paddleOne.score <= gameoverPoint || paddleTwo.score <= gameoverPoint) { 
         moveBall();
         movePaddles();
     }
@@ -81,23 +82,6 @@ function moveBall() {
     ball.y = ball.y + ball.speedY;
 }
 
-function movePaddles() {
-    if (paddleTwo.downPressed) {
-        movePaddleDown(paddleTwo);
-    }
-    else if (paddleTwo.upPressed) {
-        movePaddleUp(paddleTwo)
-    }
-    // about player 1 paddle
-    if (paddleOne.downPressed) {
-        movePaddleDown(paddleOne);
-    }
-    else if (paddleOne.upPressed) {
-        movePaddleUp(paddleOne);
-    }
-    // about player 2 paddle
-}
-
 function keyDownHandler(e) {
     if (e.key == "Up" || e.key == "ArrowUp") {
         paddleTwo.upPressed = true;
@@ -128,8 +112,39 @@ function keyUpHandler(e) {
     }
 }  // about which keys I want to ues
 
+function movePaddles() {
+    if (paddleTwo.downPressed) {
+        movePaddleDown(paddleTwo);
+    }
+    else if (paddleTwo.upPressed) {
+        movePaddleUp(paddleTwo)
+    }
+    // about player 1 paddle
+    if (paddleOne.downPressed) {
+        movePaddleDown(paddleOne);
+    }
+    else if (paddleOne.upPressed) {
+        movePaddleUp(paddleOne);
+    }
+    // about player 2 paddle
+}
+
+function movePaddleDown(paddle) {
+    paddle.y = paddle.y + paddle.speed;
+    if (paddle.y + 100 > canvas.height) {
+        paddle.y = canvas.height - 100;
+    }
+}
+
+function movePaddleUp(paddle) {
+    paddle.y = paddle.y - paddle.speed;
+    if (paddle.y < 0) {
+        paddle.y = 0
+    }
+}
+
 function drawEverything() {
-    if (paddleOne.score < gameoverPoint || paddleTwo.score < gameoverPoint) {
+    if (paddleOne.score <= gameoverPoint || paddleTwo.score <= gameoverPoint) {
         colorRect(0, 0, canvas.width, canvas.height, 'black');
         // above line blanks out the screen with black
     
@@ -146,8 +161,8 @@ function drawEverything() {
         canvasContext.fillText(paddleOne.score, 50, 50);
         canvasContext.fillText(paddleTwo.score, canvas.width - 70, 50);
     } else {
-        canvasContext.font = "200px Comic Sans MS";
-        canvasContext.fillStyle = 'white';
+        canvasContext.font = "20px Comic Sans MS";
+        canvasContext.fillStyle = 'black';
         canvasContext.fillText("Game Over", canvas.width/2, canvas.height/2);
     }
 }
@@ -165,16 +180,3 @@ function colorRect(leftX, topY, width, height, drawColor) {
 
 }
 
-function movePaddleDown(paddle) {
-    paddle.y = paddle.y + paddle.speed;
-    if (paddle.y + 100 > canvas.height) {
-        paddle.y = canvas.height - 100;
-    }
-}
-
-function movePaddleUp(paddle) {
-    paddle.y = paddle.y - paddle.speed;
-    if (paddle.y < 0) {
-        paddle.y = 0
-    }
-}
